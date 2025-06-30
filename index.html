@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SpotiFake Style - Página Principal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+  /* Reset básico */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    background-color: #121212;
+    color: #fff;
+    height: 100vh;
+    display: flex;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px;
+  }
+
+  .sidebar .logo {
+    font-weight: 900;
+    font-size: 26px;
+    color: #1db954;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    cursor: default;
+  }
+
+  .sidebar nav a {
+    display: flex;
+    align-items: center;
+    color: #b3b3b3;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .sidebar nav a:hover,
+  .sidebar nav a.active {
+    background-color: #282828;
+    color: #fff;
+  }
+
+  /* Icons simples para menu */
+  .sidebar nav a svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    fill: currentColor;
+  }
+
+  /* Main content */
+  .main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #181818;
+  }
+
+  /* Topbar */
+  .topbar {
+    height: 60px;
+    background-color: #121212;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 30px;
+    border-bottom: 1px solid #282828;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: default;
+  }
+
+  .user-info img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .user-info span {
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .btn-logout {
+    margin-left: 20px;
+    background-color: transparent;
+    border: 1.5px solid #1db954;
+    color: #1db954;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .btn-logout:hover {
+    background-color: #1db954;
+    color: #121212;
+  }
+
+  /* Content area */
+  .content-area {
+    flex-grow: 1;
+    padding: 40px 50px;
+  }
+
+  .content-area h1 {
+    font-weight: 900;
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  /* Scrollbar dark */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #121212;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #1db954;
+    border-radius: 10px;
+  }
+
+  /* Responsivo simples */
+  @media(max-width: 720px) {
+    .sidebar {
+      display: none;
+    }
+    .main-content {
+      padding-top: 60px;
+    }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="logo">SPOTIFAKE</div>
+    <nav>
+      <a href="#" class="active" aria-current="page">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h12v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+        Home
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path d="M9 2v2h6V2H9zm9 4H6c-1.1 0-2 .9-2 2v11h2v-1h11c.55 0 1-.45 1-1v-1h-3v2H8v2h9c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+        Pesquisar
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        Sua Playlist
+      </a>
+    </nav>
+  </aside>
+
+  <div class="main-content">
+    <header class="topbar">
+      <div class="user-info" id="userInfo" style="display:none;">
+        <img id="userPhoto" src="" alt="Foto do usuário" />
+        <span id="userName"></span>
+        <button class="btn-logout" id="btnLogout">Sair</button>
+      </div>
+    </header>
+
+    <section class="content-area">
+      <h1>Bem-vindo, <span id="userNameMain">Usuário</span>!</h1>
+      <p>Escute suas músicas no spotiFake</p>
+    </section>
+  </div>
+
+<script>
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      const name = user.displayName || user.email;
+      const photo = user.photoURL || "https://via.placeholder.com/36?text=U";
+
+      document.getElementById('userName').innerText = name;
+      document.getElementById('userNameMain').innerText = name;
+      document.getElementById('userPhoto').src = photo;
+
+      document.getElementById('userInfo').style.display = 'flex';
+    } else {
+      window.location.href = "login.html";
+    }
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    auth.signOut().then(() => {
+      window.location.href = "login.html";
+    });
+  });
+</script>
+
+</body>
+</html>

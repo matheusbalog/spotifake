@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cadastro - SpotiFake</title>
+
+<header style="background:#121212; height:60px; display:flex; align-items:center; justify-content:space-between; padding: 0 30px; border-bottom: 1px solid #282828;">
+  <div style="font-weight:900; font-size:26px; color:#1db954; letter-spacing:2px; cursor:default;">SPOTIFAKE</div>
+</header>
+
+<style>
+  body {
+    background: #121212;
+    color: #fff;
+    font-family: "Spotify Circular", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  form {
+    background: #282828;
+    padding: 30px;
+    border-radius: 10px;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="file"] {
+    margin-bottom: 20px;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  button {
+    background: #1db954;
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #1ed760;
+  }
+  h1 {
+    margin-bottom: 24px;
+    font-weight: 700;
+    text-align: center;
+  }
+  a {
+    color: #1db954;
+    text-decoration: none;
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: center;
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+
+  <form id="formCadastro">
+    <h1>Cadastro</h1>
+    <input type="text" id="nomeUsuario" placeholder="Nome de usuário" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="senha" placeholder="Senha" required />
+    <h4>FOTO DE PERFIL</h4>
+    <input type="file" id="foto" accept="image/*" />
+    <button type="submit">Cadastrar</button>
+    <a href="login.html">Já tem conta? Entrar</a>
+  </form>
+
+<script>
+document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const nomeUsuario = document.getElementById('nomeUsuario').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const fotoFile = document.getElementById('foto').files[0];
+
+  try {
+    const userCredential = await auth.createUserWithEmailAndPassword(email, senha);
+    const user = userCredential.user;
+
+    let fotoURL = null;
+    if (fotoFile) {
+      const storageRef = storage.ref();
+      const fotoRef = storageRef.child(`fotosUsuarios/${user.uid}/${fotoFile.name}`);
+      await fotoRef.put(fotoFile);
+      fotoURL = await fotoRef.getDownloadURL();
+    }
+
+    await user.updateProfile({
+      displayName: nomeUsuario,
+      photoURL: fotoURL
+    });
+
+    alert('Cadastro realizado com sucesso!');
+    window.location.href = "index.html";
+
+  } catch (error) {
+    alert('Erro: ' + error.message);
+  }
+});
+</script>
+</body>
+</html>

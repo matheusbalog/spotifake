@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Player estilo Spotify</title>
+<style>
+  body {
+    background: #121212;
+    font-family: 'Montserrat', Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #fff;
+  }
+
+  .player {
+    background: #282828;
+    border-radius: 16px;
+    padding: 20px;
+    width: 350px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cover {
+    width: 280px;
+    height: 280px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 20px;
+  }
+
+  .info {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .info h2 {
+    margin-bottom: 6px;
+    font-weight: 700;
+    font-size: 22px;
+  }
+  .info p {
+    margin: 0;
+    color: #b3b3b3;
+    font-size: 16px;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .btn {
+    background: none;
+    border: none;
+    color: #1db954;
+    cursor: pointer;
+    font-size: 28px;
+    transition: color 0.3s ease;
+  }
+  .btn:hover {
+    color: #1ed760;
+  }
+
+  .progress-container {
+    width: 100%;
+    height: 6px;
+    background: #404040;
+    border-radius: 3px;
+    margin: 20px 0;
+    cursor: pointer;
+  }
+
+  .progress {
+    height: 6px;
+    background: #1db954;
+    width: 0%;
+    border-radius: 3px;
+  }
+
+  .time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #b3b3b3;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+
+<div class="player">
+  <div class="cover" id="cover"></div>
+  <div class="info">
+    <h2 id="title">Título da Música</h2>
+    <p id="artist">Artista</p>
+  </div>
+
+  <div class="progress-container" id="progress-container">
+    <div class="progress" id="progress"></div>
+  </div>
+  <div class="time">
+    <span id="current-time">0:00</span>
+    <span id="duration">0:00</span>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev" title="Anterior">&#9664;&#9664;</button>
+    <button class="btn" id="play" title="Play">&#9654;</button>
+    <button class="btn" id="next" title="Próxima">&#9654;&#9654;</button>
+  </div>
+
+  <audio id="audio"></audio>
+</div>
+
+<script>
+  const songs = [
+    {
+      title: "Sunflower",
+      artist: "Post Malone, Swae Lee",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      cover: "https://i.scdn.co/image/ab67616d0000b2735a042a58d00b55828203c9aa"
+    },
+    {
+      title: "Blinding Lights",
+      artist: "The Weeknd",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      cover: "https://i.scdn.co/image/ab67616d0000b2734c1bf4341090f2d2858b2280"
+    },
+    {
+      title: "Levitating",
+      artist: "Dua Lipa",
+      src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+      cover: "https://i.scdn.co/image/ab67616d0000b273462e0a2e0bc1a79a6a28d684"
+    }
+  ];
+
+  let currentSongIndex = 0;
+
+  const audio = document.getElementById('audio');
+  const cover = document.getElementById('cover');
+  const title = document.getElementById('title');
+  const artist = document.getElementById('artist');
+  const progress = document.getElementById('progress');
+  const progressContainer = document.getElementById('progress-container');
+  const currentTimeEl = document.getElementById('current-time');
+  const durationEl = document.getElementById('duration');
+  const playBtn = document.getElementById('play');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+
+  function loadSong(song) {
+    title.textContent = song.title;
+    artist.textContent = song.artist;
+    audio.src = song.src;
+    cover.style.backgroundImage = `url(${song.cover})`;
+  }
+
+  function playSong() {
+    audio.play();
+    playBtn.innerHTML = '&#10073;&#10073;'; // pause icon
+    playBtn.title = "Pausar";
+  }
+
+  function pauseSong() {
+    audio.pause();
+    playBtn.innerHTML = '&#9654;'; // play icon
+    playBtn.title = "Tocar";
+  }
+
+  playBtn.addEventListener('click', () => {
+    if(audio.paused){
+      playSong();
+    } else {
+      pauseSong();
+    }
+  });
+
+  prevBtn.addEventListener('click', () => {
+    currentSongIndex--;
+    if(currentSongIndex < 0) currentSongIndex = songs.length -1;
+    loadSong(songs[currentSongIndex]);
+    playSong();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    currentSongIndex++;
+    if(currentSongIndex > songs.length -1) currentSongIndex = 0;
+    loadSong(songs[currentSongIndex]);
+    playSong();
+  });
+
+  audio.addEventListener('timeupdate', (e) => {
+    if(audio.duration){
+      const progressPercent = (audio.currentTime / audio.duration) * 100;
+      progress.style.width = `${progressPercent}%`;
+
+      // Atualiza tempo atual
+      let currentMins = Math.floor(audio.currentTime / 60);
+      let currentSecs = Math.floor(audio.currentTime % 60);
+      if(currentSecs < 10) currentSecs = '0' + currentSecs;
+      currentTimeEl.textContent = `${currentMins}:${currentSecs}`;
+
+      // Atualiza duração
+      let durationMins = Math.floor(audio.duration / 60);
+      let durationSecs = Math.floor(audio.duration % 60);
+      if(durationSecs < 10) durationSecs = '0' + durationSecs;
+      durationEl.textContent = `${durationMins}:${durationSecs}`;
+    }
+  });
+
+  progressContainer.addEventListener('click', (e) => {
+    const width = progressContainer.clientWidth;
+    const clickX = e.offsetX;
+    const duration = audio.duration;
+
+    audio.currentTime = (clickX / width) * duration;
+  });
+
+  audio.addEventListener('ended', () => {
+    nextBtn.click();
+  });
+
+  // Carrega primeira música ao abrir
+  loadSong(songs[currentSongIndex]);
+</script>
+
+</body>
+</html>
